@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pawn Engine – make 2D games with a tiny, friendly language</title>
+<meta name="description" content="Pawn Engine is a free 2D game engine with its own easy language, a visual editor, GPU drawing and one-click export.">
+<link rel="icon" href="icon.png">
+<style>
+  :root { --bg:#13151a; --panel:#1a1d24; --card:#222630; --line:#303645; --text:#e8eaf0; --muted:#8a91a3; --gold:#f2b84b; --gold2:#ffd27a; --teal:#4fd1b5; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.6 "Segoe UI", Inter, system-ui, sans-serif; }
+  a { color: var(--gold2); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  nav { display:flex; align-items:center; gap:14px; padding:18px 0; }
+  nav img { width:34px; height:34px; border-radius:8px; }
+  nav b { font-size:18px; letter-spacing:.2px; }
+  nav .sp { flex:1; }
+  nav a { color:var(--muted); text-decoration:none; font-size:14px; }
+  nav a:hover { color:var(--text); }
+  .hero { padding: 48px 0 24px; text-align:center; }
+  .pill { display:inline-block; padding:4px 12px; border:1px solid var(--line); border-radius:99px; color:var(--muted); font-size:13px; background:var(--panel); }
+  h1 { font-size: clamp(34px, 6vw, 62px); line-height:1.08; margin:18px 0 14px; letter-spacing:-1px; }
+  h1 em { font-style:normal; color:var(--gold); }
+  .lead { max-width:640px; margin:0 auto 28px; color:var(--muted); font-size:18px; }
+  .btn { display:inline-flex; align-items:center; gap:10px; background:var(--gold); color:#1a1406; font-weight:700; padding:14px 26px; border-radius:12px; text-decoration:none; font-size:17px; box-shadow:0 8px 30px rgba(242,184,75,.25); transition:transform .15s, box-shadow .15s; }
+  .btn:hover { transform:translateY(-2px); box-shadow:0 12px 36px rgba(242,184,75,.35); }
+  .btn.ghost { background:transparent; color:var(--text); border:1px solid var(--line); box-shadow:none; }
+  .sub { margin-top:12px; color:var(--muted); font-size:13px; }
+  .shot { margin:40px auto 0; max-width:1000px; border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.5); background:var(--panel); }
+  .shot img { display:block; width:100%; }
+  section { padding: 56px 0 8px; }
+  h2 { font-size:30px; margin:0 0 6px; letter-spacing:-.4px; }
+  .sec-sub { color:var(--muted); margin:0 0 26px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; }
+  .card h3 { margin:0 0 6px; font-size:17px; }
+  .card p { margin:0; color:var(--muted); font-size:14.5px; }
+  pre { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:20px; overflow:auto; font:14px/1.7 "Cascadia Code", Consolas, monospace; margin:0; }
+  .k { color:#c792ea; } .s { color:#9fe3a6; } .c { color:#6a7285; } .n { color:#ffd27a; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:center; }
+  @media (max-width:760px){ .two { grid-template-columns:1fr; } }
+  .steps { counter-reset:s; display:grid; gap:12px; padding:0; list-style:none; }
+  .steps li { counter-increment:s; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px 14px 56px; position:relative; }
+  .steps li::before { content:counter(s); position:absolute; left:14px; top:12px; width:28px; height:28px; border-radius:50%; background:var(--gold); color:#1a1406; font-weight:800; display:grid; place-items:center; }
+  footer { margin-top:64px; padding:28px 0 48px; border-top:1px solid var(--line); color:var(--muted); font-size:13px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <img src="icon.png" alt="">
+    <b>Pawn Engine</b>
+    <span class="sp"></span>
+    <a href="#features">Features</a>
+    <a href="#code">The language</a>
+    <a href="#install">Install</a>
+    <a id="repo-link" href="#">GitHub</a>
+  </nav>
+
+  <header class="hero">
+    <span class="pill" id="version-pill">Free 2D game engine</span>
+    <h1>Make games with a language<br>that fits on <em>one page</em>.</h1>
+    <p class="lead">A visual editor, a friendly scripting language, GPU drawing and one-click export. Download, install, start making.</p>
+    <a class="btn" id="download" href="#install">⬇ Download for Windows</a>
+    <p class="sub" id="download-sub">Windows 10 or 11 · free · no account needed</p>
+    <div class="shot"><img src="screenshot-dark.png" alt="The Pawn Engine editor"></div>
+  </header>
+
+  <section id="features">
+    <h2>Everything in one app</h2>
+    <p class="sec-sub">Drawn by the GPU, scripted in Pawn, built for beginners and still fast.</p>
+    <div class="grid">
+      <div class="card"><h3>🧠 Pawn language</h3><p>Indentation instead of braces. <code>when</code>, <code>every</code>, <code>after</code> and <code>wait</code> read like sentences.</p></div>
+      <div class="card"><h3>🌳 Explorer-style editor</h3><p>Hierarchy with an icon per object, properties you can search, dark and light themes.</p></div>
+      <div class="card"><h3>⚡ Fast</h3><p>OpenGL instancing, a Rust core for physics and pathfinding, and a quicker interpreter.</p></div>
+      <div class="card"><h3>🧱 Ready-made objects</h3><p>Parts, platforms, ramps, zones, spawn points, beams and press-E prompts. All scriptable.</p></div>
+      <div class="card"><h3>🎆 Particles, lights, effects</h3><p>Customisable particles, lighting and darkness, screen shake and blur, ropes and springs.</p></div>
+      <div class="card"><h3>📦 Export</h3><p>File ▸ Export game turns your project into a game anyone can run.</p></div>
+    </div>
+  </section>
+
+  <section id="code">
+    <div class="two">
+      <div>
+        <h2>Code you can read out loud</h2>
+        <p class="sec-sub" style="margin:0">A hero that runs, jumps with a cooldown, and respawns after touching lava. No boilerplate, no semicolons, no curly braces.</p>
+      </div>
+<pre><span class="c"># hero.pawn</span>
+speed = <span class="n">260</span>
+
+<span class="k">when</span> key(<span class="s">"right"</span>)
+    self.x += speed * dt
+
+<span class="k">when</span> pressed(<span class="s">"space"</span>) <span class="k">and</span> can_use(<span class="s">"jump"</span>, <span class="n">0.4</span>)
+    self.jump(<span class="n">520</span>)
+
+<span class="k">on</span> touch <span class="k">as</span> who
+    <span class="k">if</span> who.has_tag(<span class="s">"lava"</span>)
+        respawn(self)</pre>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2>Install in a minute</h2>
+    <p class="sec-sub">No command line, no setup scripts.</p>
+    <ol class="steps">
+      <li><b>Download</b> <code>PawnEngine-Setup.exe</code> with the button above.</li>
+      <li><b>Run it.</b> If Windows says “protected your PC”, click <i>More info</i> ▸ <i>Run anyway</i> (the installer isn't code-signed yet).</li>
+      <li><b>Pick “Create a Desktop shortcut”</b> and finish. Pawn Engine opens.</li>
+      <li><b>Make a project</b> from the main menu. Updates are announced inside the app.</li>
+    </ol>
+    <p style="margin-top:22px"><a class="btn ghost" id="portable" href="#">Portable .zip (no install)</a></p>
+  </section>
+
+  <footer>
+    Pawn Engine's language is unrelated to CompuPhase's “Pawn” embedded language.<br>
+    <span id="foot-version"></span>
+  </footer>
+</div>
+
+<script>
+  // Set REPO to "yourname/yourrepo" if the site is NOT hosted on GitHub Pages. On Pages it works out by itself.
+  var REPO = "";
+  (function () {
+    if (!REPO) {
+      var m = location.hostname.match(/^([^.]+)\.github\.io$/);
+      var first = location.pathname.split("/").filter(Boolean)[0];
+      if (m && first) REPO = m[1] + "/" + first;
+    }
+    if (!REPO) return;                      // opened as a plain file: buttons keep their defaults
+    var base = "https://github.com/" + REPO;
+    document.getElementById("download").href = base + "/releases/latest/download/PawnEngine-Setup.exe";
+    document.getElementById("portable").href = base + "/releases/latest/download/PawnEngine-Portable.zip";
+    document.getElementById("repo-link").href = base;
+    fetch("https://api.github.com/repos/" + REPO + "/releases/latest")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (d) {
+        if (!d || !d.tag_name) return;
+        var v = String(d.tag_name).replace(/^v/i, "");
+        document.getElementById("version-pill").textContent = "Version " + v + " is out";
+        document.getElementById("download-sub").textContent = "Version " + v + " · Windows 10 or 11 · free · no account needed";
+        document.getElementById("foot-version").textContent = "Latest release: " + v;
+      }).catch(function () {});
+  })();
+</script>
+</body>
+</html>
