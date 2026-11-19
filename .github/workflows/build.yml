@@ -1,0 +1,87 @@
+name: Build installer
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Python packages
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller maturin
+
+      - name: Remember which repository this came from
+        shell: bash
+        run: |
+          printf '{"repo": "%s"}\n' "${{ github.repository }}" > release.json
+
+      - name: Build the fast Rust core
+        shell: bash
+        run: |
+          cd native
+          maturin build --release
+          cd ..
+          python -m pip install native/target/wheels/pawn_core-*.whl --force-reinstall
+
+      - name: Run the tests
+        continue-on-error: true
+        shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
+          PAWN_NO_SOUND: "1"
+        run: python -m unittest discover -s tests
+
+      - name: Draw the icon
+        run: python tools/make_icon.py
+
+      - name: Build the app
+        run: python tools/build_app.py
+
+      - name: Work out the version number
+        id: ver
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then V="${GITHUB_REF#refs/tags/v}"; else V="0.0-dev"; fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Build the installer
+        shell: pwsh
+        run: |
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue)) { choco install innosetup -y --no-progress }
+          $iscc = (Get-Command iscc -ErrorAction SilentlyContinue).Source
+          if (-not $iscc) { $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" }
+          & $iscc "/DAppVersion=${{ steps.ver.outputs.version }}" installer\PawnEngine.iss
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: Make a portable zip too
+        shell: pwsh
+        run: Compress-Archive -Path dist\PawnEngine -DestinationPath installer-output\PawnEngine-Portable.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PawnEngine-Windows
+          path: installer-output/*
+
+      - name: Attach to the release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            installer-output/PawnEngine-Setup.exe
+            installer-output/PawnEngine-Portable.zip
+          generate_release_notes: true
